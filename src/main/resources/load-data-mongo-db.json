@@ -1,0 +1,31 @@
+[
+  {
+    "productId": "11111111",
+    "clientId": "2222222",
+    "accountNumber": "0044112777",
+    "creditType": "PERSONAL_LOAN",
+    "currency": "PEN",
+    "status": "APROBADO",
+    "individualLoan" : {
+
+    },
+    "creditCard" : {
+      "cardNumber" : "",
+      "accountNumber" : "",
+      "cardHolder" : {
+
+      },
+      "expirationDate" : "",
+      "securityCode" : "",
+      "currentBalance" : 100,
+      "availableCredit" : 200,
+      "minimumPaymentDue" : 100,
+      "paymentDueDate" : "",
+      "lastPaymentAmount" : 100,
+      "lastPaymentDate" : "",
+      "billingDay" : 25,
+      "isContactlessEnabled" : true,
+      "cardBrand" : "PLATINO"
+    }
+  }
+]

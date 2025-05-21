@@ -1,0 +1,26 @@
+
+
+Datos básicos
+id: Identificador único del préstamo (UUID o Long).
+monto: Monto total solicitado/prestado.
+moneda: Tipo de moneda (USD, EUR, etc.).
+plazo: Duración del préstamo (en meses, días, etc.).
+tasaInteres: Tasa de interés (puede ser anual, mensual).
+tipoInteres: Fijo / Variable.
+fechaInicio: Fecha en que comienza el préstamo.
+fechaFin: Fecha estimada de finalización (último pago).
+
+Estado del préstamo
+estado: Ej. APROBADO, EN_PROCESO, RECHAZADO, VIGENTE, CANCELADO, VENCIDO.
+saldoPendiente: Cuánto queda por pagar.
+numeroCuotas: Total de cuotas pactadas.
+cuotasPagadas: Número de cuotas pagadas.
+frecuenciaPago: Ej. MENSUAL, QUINCENAL, etc.
+
+Cobranzas / Penalidades
+mora: Monto acumulado por atraso (si aplica).
+tasaMora: Porcentaje aplicado en caso de mora.
+fechaUltimoPago: Última fecha de pago.
+
+
+APROBADO, EN_PROCESO, RECHAZADO, VIGENTE, CANCELADO, VENCIDO
