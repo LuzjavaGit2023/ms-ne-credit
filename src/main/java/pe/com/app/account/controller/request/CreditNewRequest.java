@@ -29,7 +29,6 @@ import pe.com.app.account.common.config.Currency;
 public class CreditNewRequest {
     private String productId;
     private String clientId;
-    private CreditType creditType; // PERSONAL_LOAN BUSINESS_LOAN CREDIT_CARD
     private Currency currency; // Moneda (USD, PEN, EUR, etc.)
 
     private CreditStatus status; // ESTADO (APROBADO, EN_PROCESO, RECHAZADO, VIGENTE, CANCELADO, VENCIDO)

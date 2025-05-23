@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pe.com.app.account.common.config.CardType;
-import pe.com.app.account.common.config.PaymentFrequency;
+import pe.com.app.account.common.config.CardBrandType;
+import pe.com.app.account.common.config.CardCreditType;
 import pe.com.app.account.model.dto.IndividualReferencedDto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 /**
  * <b>class</b>: CreditCardRequest <br/>
@@ -37,6 +36,7 @@ public class CreditCardRequest implements Serializable {
     private Double availableCredit;  // Saldo credito disponible
     private Integer billingDay;  // dia corte de facturacion
     private Boolean isContactlessEnabled;  // Si permite pagos sin contacto
-    private CardType cardBrand; // Visa, Mastercard, AMEX, etc.
+    private CardBrandType cardBrand; // Visa, Mastercard, AMEX, etc.
+    private CardCreditType cardCreditType; // CLASSIC, PLATINUM, GOLDEN.
 
 }

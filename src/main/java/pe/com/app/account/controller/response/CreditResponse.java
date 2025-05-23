@@ -26,4 +26,5 @@ import java.io.Serializable;
 public class CreditResponse extends CreditLoanDto implements Serializable {
 
     private static final long serialVersionUID = -4835095220588061994L;
+
 }

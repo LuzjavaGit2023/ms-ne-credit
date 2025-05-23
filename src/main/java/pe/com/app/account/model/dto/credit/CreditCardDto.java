@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pe.com.app.account.common.config.CardType;
+import pe.com.app.account.common.config.CardBrandType;
+import pe.com.app.account.common.config.CardCreditType;
 import pe.com.app.account.model.dto.IndividualReferencedDto;
 
 import java.io.Serializable;
@@ -36,6 +37,7 @@ public class CreditCardDto implements Serializable {
     private IndividualReferencedDto cardHolder; // titular de la tarjeta
     private LocalDate expirationDate; // Fecha de vencimiento de la tarjeta
     private String securityCode; // CVV encriptado
+    private String securityKey; // digital pasword
     private Double currentBalance; // Saldo actual usado
     private Double availableCredit;  // Saldo credito disponible
     private Double minimumPaymentDue; // Pago minimo requerido en el periodo actual
@@ -44,7 +46,8 @@ public class CreditCardDto implements Serializable {
     private LocalDate lastPaymentDate;  // Fecha del ultimo pago
     private Integer billingDay;  // dia corte de facturacion
     private Boolean isContactlessEnabled;  // Si permite pagos sin contacto
-    private CardType cardBrand; // Visa, Mastercard, AMEX, etc.
+    private CardBrandType cardBrand; // Visa, Mastercard, AMEX, etc.
+    private CardCreditType cardCreditType; // CLASSIC, PLATINUM, GOLDEN.
     private String issuerBank; // Banco emisor de la tarjeta
 
 }

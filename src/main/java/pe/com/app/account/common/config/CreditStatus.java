@@ -7,9 +7,10 @@ public enum CreditStatus {
     APROBADO("APROBADO"),
     EN_PROCESO("EN_PROCESO"),
     RECHAZADO("RECHAZADO"),
-    VIGENTE("VIGENTE"),
+    VIGENTE("VIGENTE"), //ya se tiene algun pago
     CANCELADO("CANCELADO"),
-    VENCIDO("VENCIDO");
+    VENCIDO("VENCIDO"),
+    INACTIVO("INACTIVO");
 
     private final String description;
 

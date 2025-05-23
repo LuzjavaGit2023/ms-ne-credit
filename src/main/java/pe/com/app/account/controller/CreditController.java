@@ -109,7 +109,7 @@ public class CreditController {
             )
     })
     public Mono<CreditResponse> getCreditByNumberAccount(@PathVariable String creditId) {
-        return service.getCreditsCreditId(creditId);
+        return service.getCreditId(creditId);
     }
 
     /**
@@ -118,10 +118,9 @@ public class CreditController {
      * @return Void Mono.
      */
     @PatchMapping("/{creditId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "This method is used to update a credit element.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Successful operation"),
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(
                             mediaType = "application/json",
@@ -129,7 +128,7 @@ public class CreditController {
                     )
             )
     })
-    public Mono<Void> updateCredit(@PathVariable String creditId, @RequestBody CreditUpdateRequest obj) {
+    public Mono<CreditResponse> updateCredit(@PathVariable String creditId, @RequestBody CreditUpdateRequest obj) {
         return service.updateCredit(creditId, obj);
     }
 

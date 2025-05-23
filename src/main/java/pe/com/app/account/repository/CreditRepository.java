@@ -3,6 +3,7 @@ package pe.com.app.account.repository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.model.persistence.CreditEntity;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -22,4 +23,6 @@ import reactor.core.publisher.Mono;
 public interface CreditRepository extends ReactiveMongoRepository<CreditEntity, String> {
 
     Mono<Long> countByClientIdAndCreditType(String id, CreditType creditType);
+
+    Flux<CreditEntity> findByClientId(String clientId);
 }

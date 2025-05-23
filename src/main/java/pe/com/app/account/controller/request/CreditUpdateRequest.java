@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pe.com.app.account.common.config.DeadLineToReturn;
 import pe.com.app.account.model.dto.IndividualReferencedDto;
 
 import java.util.List;
@@ -27,8 +28,9 @@ import java.util.List;
 @Data
 @Builder
 public class CreditUpdateRequest {
-    private Integer transactionDayEnable; //dia especifico del mes para movimiento en cuenta plazo fijo
+    private Double amount; // Monto otorgado al cliente
+    private DeadLineToReturn termDeadLineToReturn; //plazo acordado en meses o anios
 
-    private List<IndividualReferencedDto> headlines; //titulares, minimo 1
-    private List<IndividualReferencedDto> signatories; //firmantes
+    private Integer billingDay;  // dia corte de facturacion
+    private Boolean isContactlessEnabled;  // Si permite pagos sin contacto
 }

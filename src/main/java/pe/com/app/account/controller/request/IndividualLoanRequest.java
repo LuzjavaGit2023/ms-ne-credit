@@ -32,6 +32,6 @@ public class IndividualLoanRequest implements Serializable {
     private static final long serialVersionUID = -3388630192398518074L;
     private Double amount; // Monto otorgado al cliente
     private DeadLineToReturn termDeadLineToReturn; //plazo acordado en meses o anios
-    private PaymentFrequency paymentFrequency; // frecuencia de pago, cada cuanto tiempo el cliente debe realizar un pago
+    //private PaymentFrequency paymentFrequency; // frecuencia de pago, cada cuanto tiempo el cliente debe realizar un pago
 
 }

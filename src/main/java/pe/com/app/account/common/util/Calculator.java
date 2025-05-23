@@ -1,14 +1,14 @@
 package pe.com.app.account.common.util;
 
+import lombok.extern.slf4j.Slf4j;
 import pe.com.app.account.common.config.DeadLineToReturn;
 import pe.com.app.account.model.dto.credit.FeeDto;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
+@Slf4j
 public class Calculator {
 
     /**
@@ -31,13 +31,18 @@ public class Calculator {
     }
 
     public static int getTermInMonths(DeadLineToReturn termDeadLineToReturn) {
+        var monthText = "";
         switch (termDeadLineToReturn) {
             case MONTHS_6:
             case MONTHS_12:
             case MONTHS_18:
-                return Integer.parseInt(termDeadLineToReturn.getDescription().split("_")[1]); // mese
+                monthText = termDeadLineToReturn.getDescription().split("_")[1];
+                log.info("mes identificado para Tiempo de Retorno, Key {}, value {}", termDeadLineToReturn.getDescription(), monthText );
+                return Integer.parseInt(monthText); // meses
             default:
-                return Integer.parseInt(termDeadLineToReturn.getDescription().split("_")[1]) * 12; // anios
+                monthText = termDeadLineToReturn.getDescription().split("_")[1];
+                log.info("mes identificado para Tiempo de Retorno, Key {}, value {}", termDeadLineToReturn.getDescription(), monthText );
+                return Integer.parseInt(monthText) * 12; // anios
         }
     }
 
@@ -71,5 +76,31 @@ public class Calculator {
         }
 
         return saldoPendiente;
+    }
+
+    public static String generateNumber3DigitsOnBase64() {
+        Random rand = new Random();
+
+        // Generar número entre 100 y 999
+        int numero = rand.nextInt(900) + 100;
+
+        // Convertir a String y codificar en Base64
+        String numeroStr = String.valueOf(numero);
+        String base64Encoded = Base64.getEncoder().encodeToString(numeroStr.getBytes());
+
+        return base64Encoded;
+    }
+
+    public static String generateNumber4DigitsOnBase64() {
+        Random rand = new Random();
+
+        // Generar número aleatorio entre 1000 y 9999 (4 dígitos)
+        int numero = rand.nextInt(9000) + 1000;
+
+        // Convertir a String y codificar en Base64
+        String numeroStr = String.valueOf(numero);
+        String base64Encoded = Base64.getEncoder().encodeToString(numeroStr.getBytes());
+
+        return base64Encoded;
     }
 }

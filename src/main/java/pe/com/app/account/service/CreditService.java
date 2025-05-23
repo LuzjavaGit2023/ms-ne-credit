@@ -31,9 +31,9 @@ public interface CreditService {
 
     Flux<CreditResponse> getAllCreditsByDocument(DocumentType documentType, String documentNumber);
 
-    Mono<CreditResponse> getCreditsCreditId(String creditId);
+    Mono<CreditResponse> getCreditId(String creditId);
 
-    Mono<Void> updateCredit(String creditId, CreditUpdateRequest obj);
+    Mono<CreditResponse> updateCredit(String creditId, CreditUpdateRequest obj);
 
 
     Mono<Void> deleteCredit(String creditId);

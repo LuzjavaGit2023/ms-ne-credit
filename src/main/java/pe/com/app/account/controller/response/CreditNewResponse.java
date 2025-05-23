@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.model.dto.credit.FeeDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -35,4 +36,8 @@ public class CreditNewResponse {
     private CreditType creditType;
     private Boolean fixedRate;
     private List<FeeDto> schedule;
+
+    private LocalDate expirationDate; // Fecha de vencimiento de la tarjeta
+    private String securityCode; // CVV encriptado
+    private String securityKey; // digital pasword
 }
