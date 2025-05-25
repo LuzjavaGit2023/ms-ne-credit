@@ -32,7 +32,7 @@ public class CreditEntity implements Serializable {
 
     private CreditStatus status; // ESTADO (APROBADO, EN_PROCESO, RECHAZADO, VIGENTE, CANCELADO, VENCIDO)
 
-    private IndividualLoanDto individualLoan; // credito por persona
+    private IndividualLoanDto individualLoan; // credito por persona, empresa
     private CreditCardDto creditCard; // tarjeta de crédito
 
     //Audit

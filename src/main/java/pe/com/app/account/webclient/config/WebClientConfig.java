@@ -21,4 +21,11 @@ public class WebClientConfig {
                 .build();
     }
 
+    @Bean
+    public WebClient clientWebToTransaction(TransactionServiceConfig config) {
+        return WebClient.builder()
+                .baseUrl(config.getUrl())
+                .build();
+    }
+
 }

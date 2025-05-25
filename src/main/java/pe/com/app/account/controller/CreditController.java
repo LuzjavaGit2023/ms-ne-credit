@@ -171,8 +171,8 @@ public class CreditController {
                     )
             )
     })
-    public Mono<Void> payCredit(@PathVariable String creditId, @RequestBody PaymentRequest deposit) {
-        return service.payCredit(creditId, deposit);
+    public Mono<Void> savePayment(@PathVariable String creditId, @RequestBody PaymentRequest deposit) {
+        return service.savePayment(creditId, deposit);
     }
 
     /**
@@ -182,7 +182,7 @@ public class CreditController {
      */
     @PostMapping("/{creditId}/consumption")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "This method is used to save a consumption to an account element.")
+    @Operation(summary = "This method is used to save a consumption to a credit element.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful operation"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -192,7 +192,7 @@ public class CreditController {
                     )
             )
     })
-    public Mono<Void> consumeCredit(@PathVariable String creditId, @RequestBody ConsumptionRequest consumption) {
-        return service.consumeCredit(creditId, consumption);
+    public Mono<Void> saveConsumption(@PathVariable String creditId, @RequestBody ConsumptionRequest consumption) {
+        return service.saveConsumption(creditId, consumption);
     }
 }

@@ -37,8 +37,8 @@ public interface CreditService {
 
 
     Mono<Void> deleteCredit(String creditId);
-    Mono<Void> payCredit(String creditId, PaymentRequest payment);
+    Mono<Void> savePayment(String creditId, PaymentRequest payment);
 
-    Mono<Void> consumeCredit(String creditId, ConsumptionRequest consumption);
+    Mono<Void> saveConsumption(String creditId, ConsumptionRequest consumption);
 
 }

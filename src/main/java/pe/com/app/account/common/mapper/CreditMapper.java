@@ -50,7 +50,7 @@ public class CreditMapper {
                     .expirationDate(nowTime.plusYears(5).toLocalDate())
                     .securityCode(Calculator.generateNumber3DigitsOnBase64())
                     .securityKey(Calculator.generateNumber4DigitsOnBase64())
-                    .currentBalance(0d)
+                    .currentBalance(c.getAvailableCredit())
                     .availableCredit(c.getAvailableCredit())
                     .minimumPaymentDue(0d)
                     .lastPaymentAmount(0d)

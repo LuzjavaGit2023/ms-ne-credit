@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pe.com.app.account.common.config.Currency;
+
+import java.io.Serializable;
 
 /**
  * <b>class</b>: ConsumptionRequest <br/>
@@ -23,6 +26,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class ConsumptionRequest {
-    private String id;
+public class ConsumptionRequest implements Serializable {
+    private static final long serialVersionUID = -1482580240273914036L;
+    private Double amount;
+    private Currency currency; // Moneda (USD, PEN, EUR, etc.)
 }

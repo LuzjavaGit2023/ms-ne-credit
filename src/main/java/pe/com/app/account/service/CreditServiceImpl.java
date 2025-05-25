@@ -3,10 +3,7 @@ package pe.com.app.account.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pe.com.app.account.common.config.ClientType;
-import pe.com.app.account.common.config.CreditStatus;
-import pe.com.app.account.common.config.CreditType;
-import pe.com.app.account.common.config.DocumentType;
+import pe.com.app.account.common.config.*;
 import pe.com.app.account.common.mapper.CreditMapper;
 import pe.com.app.account.common.util.Constant;
 import pe.com.app.account.controller.request.CreditNewRequest;
@@ -21,9 +18,11 @@ import pe.com.app.account.model.persistence.CreditEntity;
 import pe.com.app.account.repository.CreditRepository;
 import pe.com.app.account.webclient.ClientClient;
 import pe.com.app.account.webclient.ProductClient;
+import pe.com.app.account.webclient.TransactionClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -51,15 +50,17 @@ public class CreditServiceImpl implements CreditService {
     private final ClientClient clientClient;
     private final ProductClient productClient;
 
+    private final TransactionClient transactionClient;
+
     @Override
     public Mono<CreditNewResponse> newCredit(CreditNewRequest obj) {
-        log.info("newCredit : execute, request {}", obj);
+        log.info("newCredit ::::::::::::::: execute, request {}", obj);
         return productClient.getProduct(obj.getProductId())
-                .flatMap(productDto -> validateCorrectProduct(productDto))
+                .flatMap(this::validateCorrectProduct)
                 .flatMap(productDto -> clientClient.getClient(obj.getClientId())
                         .flatMap(clientDto -> validateCorrectClient(productDto, clientDto))
                         .flatMap(clientDto ->
-                                validateRules(productDto, clientDto, obj)
+                                validateRules(productDto, clientDto)
                                         .flatMap(aBoolean -> saveNewCreditValidated(obj, clientDto, productDto))
                                 )
                 );
@@ -85,7 +86,7 @@ public class CreditServiceImpl implements CreditService {
     private Mono<CreditNewResponse> saveNewCreditValidated(CreditNewRequest obj, ClientDto client, ProductDto product) {
         log.info("saveNewCreditValidated, nueva credit product {}", obj);
         return Mono.just(CreditMapper.buildCreditEntityNew(obj, client, product))
-                .flatMap(creditEntity -> assignCardNumber(creditEntity, client, product))
+                .flatMap(this::assignCardNumber)
                 .flatMap(creditEntity -> repository.save(creditEntity))
                 .map(creditEntity -> {
                     log.info("resultado del registro {}", creditEntity);
@@ -107,7 +108,7 @@ public class CreditServiceImpl implements CreditService {
                 });
     }
 
-    private Mono<CreditEntity> assignCardNumber(CreditEntity creditEntity, ClientDto client, ProductDto product) {
+    private Mono<CreditEntity> assignCardNumber(CreditEntity creditEntity) {
         StringBuilder cardNumber = new StringBuilder("");
         switch (creditEntity.getCreditType()) {
             case CREDIT_CARD :
@@ -115,7 +116,7 @@ public class CreditServiceImpl implements CreditService {
                 LocalDateTime horaActual = LocalDateTime .now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-ddHH-mmss");
                 String random = horaActual.format(formatter);
-                cardNumber.append(Constant.IDENTIFY_VISA + random);
+                cardNumber.append(Constant.IDENTIFY_VISA).append(random);
 
                 log.info("assignCardNumber : numero de tarjeta asignada : " + cardNumber);
 
@@ -130,16 +131,16 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Flux<CreditResponse> getAllCreditsByDocument(DocumentType documentType, String documentNumber) {
-        log.info("getAllCreditsByDocument : execute, documentType {}, documentNumber {} ", documentType, documentNumber);
+        log.info("getAllCreditsByDocument ::::::::::::::: execute, documentType {}, documentNumber {} ", documentType, documentNumber);
         return clientClient.getClientByDocument(documentType, documentNumber)
                 .flatMapMany(clientDto -> repository.findByClientId(clientDto.getId())
-                        .map(creditEntity -> CreditMapper.buildCreditResponse(creditEntity)));
+                        .map(CreditMapper::buildCreditResponse));
 
     }
 
     @Override
     public Mono<CreditResponse> getCreditId(String creditId) {
-        log.info("getCreditId : execute, creditId {}", creditId);
+        log.info("getCreditId ::::::::::::::: execute, creditId {}", creditId);
         return repository.findById(creditId)
                 .switchIfEmpty(Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_FOUND)))
                 .flatMap(creditEntity -> {
@@ -148,7 +149,7 @@ public class CreditServiceImpl implements CreditService {
                     }
                     return Mono.just(creditEntity);
                 })
-                .map(creditEntity -> CreditMapper.buildCreditResponse(creditEntity))
+                .map(CreditMapper::buildCreditResponse)
                 .flatMap(creditResponse -> {
                     if (CreditType.CREDIT_CARD.equals(creditResponse.getCreditType())) {
                         creditResponse.getCreditCard().setSecurityCode(null);
@@ -160,7 +161,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Mono<CreditResponse> updateCredit(String creditId, CreditUpdateRequest obj) {
-        log.info("updateCredit : execute, creditId {}, request {}", creditId, obj);
+        log.info("updateCredit ::::::::::::::: execute, creditId {}, request {}", creditId, obj);
         return repository.findById(creditId)
                 .switchIfEmpty(Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_FOUND)))
                 .flatMap(creditEntity -> validateCorrectInput(creditEntity, obj))
@@ -202,7 +203,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Mono<Void> deleteCredit(String creditId) {
-        log.info("deleteCredit : execute, creditId {}", creditId);
+        log.info("deleteCredit ::::::::::::::: execute, creditId {}", creditId);
         return repository.findById(creditId)
                 .switchIfEmpty(Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_FOUND)))
                 .flatMap(creditEntity -> {
@@ -214,15 +215,155 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
-    public Mono<Void> payCredit(String creditId, PaymentRequest deposit) {
-        log.info("payCredit : execute, creditId {}, request {}", creditId, deposit);
-        return null;
+    public Mono<Void> savePayment(String creditId, PaymentRequest payment) {
+        log.info("savePayment ::::::::::::::: execute, creditId {}, request {}", creditId, payment);
+        return repository.findById(creditId)
+                .switchIfEmpty(Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_FOUND)))
+                .flatMap(creditEntity -> {
+                    log.info("CreditType : {}", creditEntity.getCreditType());
+                    if (CreditStatus.INACTIVO.equals(creditEntity.getStatus())) {
+                        return Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_ACTIVE));
+                    }
+                    if (payment.getCurrency() == null) {
+                        payment.setCurrency(creditEntity.getCurrency());
+                    }
+                    //registrar transaccion
+                    //adicionar saldo, liberar saldo disponible
+                    return validateAvailablePayment(creditEntity, payment)
+                            .flatMap(paymentRequest -> executePayment(creditId, creditEntity, paymentRequest));
+                }).then();
     }
 
     @Override
-    public Mono<Void> consumeCredit(String creditId, ConsumptionRequest withdrawal) {
-        log.info("consumeCredit : execute, creditId {}, request {}", creditId, withdrawal);
-        return null;
+    public Mono<Void> saveConsumption(String creditId, ConsumptionRequest consumption) {
+        log.info("saveConsumption ::::::::::::::: execute, creditId {}, request {}", creditId, consumption);
+        return repository.findById(creditId)
+                .switchIfEmpty(Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_FOUND)))
+                .flatMap(creditEntity -> {
+                    log.info("CreditType : {}", creditEntity.getCreditType());
+                    if (CreditStatus.INACTIVO.equals(creditEntity.getStatus())) {
+                        return Mono.error(new IllegalStateException(Constant.ELEMENT_NOT_ACTIVE));
+                    }
+                    if (consumption.getCurrency() == null) {
+                        consumption.setCurrency(creditEntity.getCurrency());
+                    }
+                    //validar si hay saldo disponible
+                    //decrementar, consumir saldo disponible y registrar transaccion
+                    return validateAvailableConsumption(creditEntity, consumption)
+                            .flatMap(consumptionRequest -> executeConsumption(creditId, creditEntity, consumptionRequest));
+                })
+                .then();
+    }
+
+    private Mono<CreditEntity> executePayment(String creditId, CreditEntity creditEntity, PaymentRequest paymentRequest) {
+        return transactionClient.savePayment(creditId, paymentRequest)
+                .flatMap(transactionResponseDto -> {
+                    log.info("Payment saved with id : {}", transactionResponseDto.getId());
+
+                    if (CreditType.CREDIT_CARD.equals(creditEntity.getCreditType())) {
+
+                        log.info("Pago como TARDEJTA DE CREDITO");
+                        Double currentAvailableCredit = creditEntity.getCreditCard().getAvailableCredit();
+                        Double currentBalance = creditEntity.getCreditCard().getCurrentBalance();
+                        Double newCurrentBalance = currentBalance + paymentRequest.getAmount();
+
+                        log.info("CurrentAvailableCredit : {}", currentAvailableCredit);
+                        log.info("CurrentBalance : {}", currentBalance);
+                        log.info("New CurrentBalance : {}", newCurrentBalance);
+                        log.info("Amount : {}", paymentRequest.getAmount());
+
+                        creditEntity.getCreditCard().setCurrentBalance(newCurrentBalance);
+                        return repository.save(creditEntity).doOnNext(creditEntity1 -> log.info("Balance updated"));
+
+                    } else { // prestamo personal o negocio, involucra documento de pago, de una cuota
+
+                        log.info("Pago como PRESTAMO");
+                        return changeFeeDocToPaid(creditEntity, paymentRequest)
+                                .flatMap(creditEntityUpdated -> repository.save(creditEntityUpdated))
+                                .doOnNext(creditEntity1 -> log.info("Balance updated"));
+
+                    }
+                });
+    }
+
+    private Mono<CreditEntity> changeFeeDocToPaid(CreditEntity creditEntity, PaymentRequest paymentRequest) {
+        return creditEntity.getIndividualLoan().getSchedule()
+                .stream()
+                .filter(feeDto -> feeDto.getUuid().equals(paymentRequest.getFeeId()))
+                .findFirst()
+                .map(feeDoc -> {
+                    feeDoc.setStatus(FeeStatusType.PAID);
+                    feeDoc.setPaidDate(LocalDate.now());
+                    log.info("Documento de pago : {}", feeDoc);
+                    return Mono.just(creditEntity);
+                })
+                .orElseGet(() -> Mono.error(new IllegalStateException("No existe documento indicado para el pago , no procede")));
+
+    }
+
+    private Mono<CreditEntity> executeConsumption(String creditId, CreditEntity creditEntity, ConsumptionRequest consumptionRequest) {
+        return transactionClient.saveConsumption(creditId, consumptionRequest)
+                .flatMap(transactionResponseDto -> {
+                    log.info("Consumption saved with id : {}", transactionResponseDto.getId());
+                    Double currentAvailableCredit = creditEntity.getCreditCard().getAvailableCredit();
+                    Double currentBalance = creditEntity.getCreditCard().getCurrentBalance();
+                    Double newCurrentBalance = currentBalance + consumptionRequest.getAmount();
+
+                    log.info("CurrentAvailableCredit : {}", currentAvailableCredit);
+                    log.info("CurrentBalance : {}", currentBalance);
+                    log.info("New AvailableCredit : {}", newCurrentBalance);
+                    log.info("Amount : {}", consumptionRequest.getAmount());
+
+                    creditEntity.getCreditCard().setCurrentBalance(newCurrentBalance);
+                    return repository.save(creditEntity).doOnNext(creditEntity1 -> log.info("Balance updated"));
+                });
+    }
+
+
+    private Mono<PaymentRequest> validateAvailablePayment(CreditEntity creditEntity, PaymentRequest payment) {
+        Double amount = payment.getAmount();
+        if (amount <= 0.0) {
+            log.info("validateAvailablePayment: el monto debe ser mayor a cero");
+            return Mono.error(new IllegalStateException("En Pago, el monto debe ser mayor a cero, no procede."));
+        }
+        if (!CreditType.CREDIT_CARD.equals(creditEntity.getCreditType())) {
+            //estamos en prestamo (personal o empresa), validar datos de Doc de Pago
+            if (payment.getFeeId() == null) {
+                log.info("validateAvailablePayment: En Pago prestamo, debe ingresar el Doc. de Pago Id");
+                return Mono.error(new IllegalStateException("En Pago prestamo, debe ingresar el Doc. de Pago Id, no procede."));
+            }
+
+        }
+        log.info("Montos y campos requeridos, validados");
+        return Mono.just(payment);
+        /*
+        return creditEntity.getIndividualLoan().getSchedule()
+                .stream()
+                .filter(feeDto -> feeDto.getUuid().equals(payment.getFeeId()))
+                .findFirst()
+                .map(feeDoc -> {
+                    if (FeeStatusType.PAID.equals(feeDoc.getStatus())) {
+                       return Mono.error(new IllegalStateException("En Pago prestamo, debe ingresar el Doc. de Pago Id, no procede."));
+
+                    }
+                    log.info("Montos y campos requeridos, validados");
+                    return Mono.just(payment);
+                })
+                .orElseGet(() -> Mono.error(new IllegalStateException("No existe documento indicado para el pago , no procede")));
+        */
+    }
+    private Mono<ConsumptionRequest> validateAvailableConsumption(CreditEntity creditEntity, ConsumptionRequest consumption) {
+        Double currentBalance = creditEntity.getCreditCard().getCurrentBalance();
+        Double amount = consumption.getAmount();
+        if (amount <= 0.0) {
+            log.info("validateAvailableConsumption: el monto debe ser mayor a cero");
+            return Mono.error(new IllegalStateException("En consumo, el monto debe ser mayor a cero, no procede."));
+        }
+        else if ( (currentBalance - amount) < 0.0) {
+            log.info("validateAvailableConsumption: no hay suficiente saldo disponible para la operacion[saldo {}]", currentBalance);
+            return Mono.error(new IllegalStateException("En consumo, no hay suficiente saldo disponible para la operacion, no procede."));
+        }
+        return Mono.just(consumption);
     }
 
     private Mono<ProductDto> validateCorrectProduct(ProductDto productDto) {
@@ -230,10 +371,10 @@ public class CreditServiceImpl implements CreditService {
                 .anyMatch(r -> r.name().equalsIgnoreCase(productDto.getProductSubType()));
         log.info("Is product valid to account : {} on {}", valid, productDto.getProductSubType());
         if (valid) return Mono.just(productDto);
-        return Mono.error(new IllegalStateException("Producto seleccionado no es valido para una cuenta, no procede."));
+        return Mono.error(new IllegalStateException("Producto seleccionado no es valido para credito, no procede."));
     }
 
-    private Mono<Boolean> validateRules(ProductDto product, ClientDto client, CreditNewRequest obj) {
+    private Mono<Boolean> validateRules(ProductDto product, ClientDto client) {
         log.info("validateRules : start product : {}", product);
         log.info("validateRules : start client : {}", client);
         log.info("validateRules : ClientType : {}", client.getClientType());
