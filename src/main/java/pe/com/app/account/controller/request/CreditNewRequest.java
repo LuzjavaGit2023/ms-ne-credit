@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.CreditStatus;
-import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.common.config.Currency;
 
 /**

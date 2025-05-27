@@ -1,5 +1,6 @@
 package pe.com.app.account.common.mapper;
 
+import java.time.LocalDateTime;
 import pe.com.app.account.common.config.CreditStatus;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.common.config.DeadLineToReturn;
@@ -16,27 +17,25 @@ import pe.com.app.account.model.dto.credit.IndividualLoanDto;
 import pe.com.app.account.model.dto.product.ProductDto;
 import pe.com.app.account.model.persistence.CreditEntity;
 
-import java.time.LocalDateTime;
-
 public class CreditMapper {
 
-    public static CreditEntity buildCreditEntityNew(CreditNewRequest request, ClientDto client, ProductDto productDto){
+    public static CreditEntity buildCreditEntityNew(CreditNewRequest request, ClientDto client, ProductDto productDto) {
 
         IndividualLoanDto loan = null;
         CreditCardDto credit = null;
-        var nowTime = LocalDateTime.now();
+        final var nowTime = LocalDateTime.now();
 
-        var currentCreditType = CreditType.fromString(productDto.getProductSubType());
+        final var currentCreditType = CreditType.fromString(productDto.getProductSubType());
 
         if (CreditType.PERSONAL_LOAN.equals(currentCreditType) || CreditType.BUSINESS_LOAN.equals(currentCreditType)) {
 
-            var p = request.getIndividualLoan();
+            final var p = request.getIndividualLoan();
             loan = buildIndividualLoanDto(p.getAmount(), PaymentFrequency.MONTHLY, p.getTermDeadLineToReturn());
 
         }
         if (CreditType.CREDIT_CARD.equals(currentCreditType)) {
 
-            var c = request.getCreditCard();
+            final var c = request.getCreditCard();
 
             credit = CreditCardDto.builder()
                     .cardNumber(null)
@@ -100,8 +99,9 @@ public class CreditMapper {
             creditEntity.getCreditCard().setBillingDay(obj.getBillingDay());
             creditEntity.getCreditCard().setIsContactlessEnabled(obj.getIsContactlessEnabled());
         } else {
-            var p = creditEntity.getIndividualLoan();
-            var loan = buildIndividualLoanDto(obj.getAmount(), p.getPaymentFrequency(), obj.getTermDeadLineToReturn());
+            final var p = creditEntity.getIndividualLoan();
+            final var loan = buildIndividualLoanDto(obj.getAmount(),
+                    p.getPaymentFrequency(), obj.getTermDeadLineToReturn());
             creditEntity.setIndividualLoan(loan);
         }
         creditEntity.setUpdatedAt(LocalDateTime.now());
@@ -113,8 +113,8 @@ public class CreditMapper {
                                                            DeadLineToReturn termDeadLineToReturn
     ) {
 
-        var nowTime = LocalDateTime.now();
-        var termInMonths = Calculator.getTermInMonths(termDeadLineToReturn);
+        final var nowTime = LocalDateTime.now();
+        final var termInMonths = Calculator.getTermInMonths(termDeadLineToReturn);
 
         //cuota fija
         var fixedFee = Calculator.calculateMonthlyPayment(
@@ -124,7 +124,7 @@ public class CreditMapper {
         );
         fixedFee = Math.round(fixedFee * 100.0) / 100.0;
 
-        var schedule = Calculator.calculateFeeList(termInMonths, fixedFee, nowTime.toLocalDate());
+        final var schedule = Calculator.calculateFeeList(termInMonths, fixedFee, nowTime.toLocalDate());
 
         return IndividualLoanDto.builder()
                 .amount(amount)
@@ -134,7 +134,8 @@ public class CreditMapper {
                 .disbursementDate(nowTime.plusDays(1))
                 .startDate(nowTime)
                 .endDate(schedule.get(schedule.size() - 1).getPaymentDate().atStartOfDay()) //ultimo fecha de pago
-                .outstandingBalance(Calculator.calcularSaldoPendiente(amount, Constant.ANNUAL_INTEREST, termInMonths, 0))
+                .outstandingBalance(Calculator.calcularSaldoPendiente(amount,
+                        Constant.ANNUAL_INTEREST, termInMonths, 0))
                 .totalInstallments(schedule.size())
                 .installmentsPaid(0) //ninguna couta pagada
                 .paymentFrequency(paymentFrequency)

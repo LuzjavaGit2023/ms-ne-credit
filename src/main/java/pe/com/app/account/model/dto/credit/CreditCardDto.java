@@ -1,5 +1,7 @@
 package pe.com.app.account.model.dto.credit;
 
+import java.io.Serializable;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +9,6 @@ import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.CardBrandType;
 import pe.com.app.account.common.config.CardCreditType;
 import pe.com.app.account.model.dto.IndividualReferencedDto;
-
-import java.io.Serializable;
-import java.time.LocalDate;
 
 /**
  * <b>class</b>: CreditCardDto <br/>

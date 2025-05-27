@@ -1,13 +1,12 @@
 package pe.com.app.account.model.dto.credit;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.common.config.Currency;
-
-import java.io.Serializable;
 
 /**
  * <b>class</b>: CreditLoanDto <br/>

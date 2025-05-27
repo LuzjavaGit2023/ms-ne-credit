@@ -1,15 +1,14 @@
 package pe.com.app.account.model.dto.credit;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.DeadLineToReturn;
 import pe.com.app.account.common.config.PaymentFrequency;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * <b>class</b>: IndividualLoanDto <br/>
@@ -35,7 +34,7 @@ public class IndividualLoanDto implements Serializable {
     // Relacionado a control financiero
     private Double amount; // Monto otorgado al cliente
     private DeadLineToReturn termDeadLineToReturn; //plazo acordado en meses o anios
-    private Integer termInMonths;// plazo acordado para devolver el prestamo
+    private Integer termInMonths; // plazo acordado para devolver el prestamo
     private Double annualInterestRate; // tasa de Interes anual
     private Boolean fixedRate;
     private LocalDateTime disbursementDate; //fecha de desembolso
@@ -44,7 +43,7 @@ public class IndividualLoanDto implements Serializable {
     private Double outstandingBalance; // saldo pendiente Cuanto queda por pagar.
     private Integer totalInstallments; // numero de cuotas
     private Integer installmentsPaid; // coutas pagadas
-    private PaymentFrequency paymentFrequency; // frecuencia de pago, cada cuanto tiempo el cliente debe realizar un pago
+    private PaymentFrequency paymentFrequency; // frecuencia de pago, cada cuanto tiempo debe realizar un pago
     private Double fixedMonthlyPayment; // Cuota mensual fija calculada
     private List<FeeDto> schedule;
 }

@@ -7,12 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @OpenAPIDefinition(
-		info = @Info(title = "API Credit", version = "1.0", description = "Reactive API for credit management")
+        info = @Info(title = "API Credit", version = "1.0", description = "Reactive API for credit management")
 )
 public class MicroServApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MicroServApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MicroServApplication.class, args);
+    }
 
 }

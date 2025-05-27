@@ -1,14 +1,13 @@
 package pe.com.app.account.controller.response;
 
+import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.model.dto.credit.FeeDto;
-
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * <b>class</b>: CreditNewResponse <br/>

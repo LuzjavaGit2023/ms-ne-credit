@@ -1,19 +1,18 @@
 package pe.com.app.account.model.persistence;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import pe.com.app.account.common.config.CreditStatus;
 import pe.com.app.account.common.config.CreditType;
 import pe.com.app.account.common.config.Currency;
-import pe.com.app.account.common.config.CreditStatus;
 import pe.com.app.account.model.dto.credit.CreditCardDto;
 import pe.com.app.account.model.dto.credit.IndividualLoanDto;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

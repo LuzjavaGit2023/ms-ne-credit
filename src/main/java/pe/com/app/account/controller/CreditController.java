@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pe.com.app.account.advice.ErrorResponse;
 import pe.com.app.account.common.config.DocumentType;
+import pe.com.app.account.controller.request.ConsumptionRequest;
 import pe.com.app.account.controller.request.CreditNewRequest;
 import pe.com.app.account.controller.request.CreditUpdateRequest;
 import pe.com.app.account.controller.request.PaymentRequest;
-import pe.com.app.account.controller.request.ConsumptionRequest;
 import pe.com.app.account.controller.response.CreditNewResponse;
 import pe.com.app.account.controller.response.CreditResponse;
 import pe.com.app.account.service.CreditService;
@@ -88,7 +88,8 @@ public class CreditController {
                     )
             )
     })
-    public Flux<CreditResponse> getAllCreditsByDocument(@PathVariable DocumentType documentType, @PathVariable String documentNumber) {
+    public Flux<CreditResponse> getAllCreditsByDocument(@PathVariable DocumentType documentType,
+                                                        @PathVariable String documentNumber) {
         return service.getAllCreditsByDocument(documentType, documentNumber);
     }
 

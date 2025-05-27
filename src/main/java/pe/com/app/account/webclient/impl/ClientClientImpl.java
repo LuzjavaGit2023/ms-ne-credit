@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.com.app.account.advice.ErrorResponse;
 import pe.com.app.account.common.config.DocumentType;
-import pe.com.app.account.controller.request.ClientRequest;
 import pe.com.app.account.model.dto.client.ClientDto;
 import pe.com.app.account.webclient.ClientClient;
 import pe.com.app.account.webclient.config.ClientServiceConfig;

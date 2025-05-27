@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.DeadLineToReturn;
-import pe.com.app.account.model.dto.IndividualReferencedDto;
-
-import java.util.List;
 
 /**
  * <b>class</b>: CreditUpdateRequest <br/>

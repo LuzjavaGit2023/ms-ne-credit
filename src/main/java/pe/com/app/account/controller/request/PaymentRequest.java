@@ -1,13 +1,12 @@
 package pe.com.app.account.controller.request;
 
+import java.io.Serializable;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pe.com.app.account.common.config.Currency;
-
-import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * <b>class</b>: PaymentRequest <br/>
