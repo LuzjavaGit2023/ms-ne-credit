@@ -94,12 +94,12 @@ public class CreditController {
     }
 
     /**
-     * This method is used to get a credit element of client by number Account.
+     * This method is used to get a credit element of client by id.
      *
-     * @return AccountResponse Mono.
+     * @return CreditResponse Mono.
      */
     @GetMapping("/{creditId}")
-    @Operation(summary = "This method is used to get a credit element of client by number Account.")
+    @Operation(summary = "This method is used to get a credit element of client by id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -109,7 +109,7 @@ public class CreditController {
                     )
             )
     })
-    public Mono<CreditResponse> getCreditByNumberAccount(@PathVariable String creditId) {
+    public Mono<CreditResponse> getCreditById(@PathVariable String creditId) {
         return service.getCreditId(creditId);
     }
 

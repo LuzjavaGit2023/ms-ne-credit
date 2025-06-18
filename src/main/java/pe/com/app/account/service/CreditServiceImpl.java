@@ -52,7 +52,6 @@ public class CreditServiceImpl implements CreditService {
     private final CreditRepository repository;
     private final ClientClient clientClient;
     private final ProductClient productClient;
-
     private final TransactionClient transactionClient;
 
     @Override
@@ -153,12 +152,6 @@ public class CreditServiceImpl implements CreditService {
         log.info("getCreditId ::::::::::::::: execute, creditId {}", creditId);
         return repository.findById(creditId)
                 .switchIfEmpty(Mono.error(buildException(Constant.ELEMENT_NOT_FOUND)))
-                .flatMap(creditEntity -> {
-                    if (CreditStatus.INACTIVO.equals(creditEntity.getStatus())) {
-                        return Mono.error(buildException(Constant.ELEMENT_NOT_ACTIVE));
-                    }
-                    return Mono.just(creditEntity);
-                })
                 .map(CreditMapper::buildCreditResponse)
                 .flatMap(creditResponse -> {
                     if (CreditType.CREDIT_CARD.equals(creditResponse.getCreditType())) {
@@ -290,14 +283,14 @@ public class CreditServiceImpl implements CreditService {
                         log.info("Amount : {}", paymentRequest.getAmount());
 
                         creditEntity.getCreditCard().setCurrentBalance(newCurrentBalance);
-                        return repository.save(creditEntity).doOnNext(creditEntity1 -> log.info("Balance updated"));
+                        return repository.save(creditEntity).doOnNext(creditEntity1 -> log.info("TC, balance updated"));
 
                     } else { // prestamo personal o negocio, involucra documento de pago, de una cuota
 
                         log.info("Pago como PRESTAMO");
                         return changeFeeDocToPaid(creditEntity, paymentRequest)
                                 .flatMap(creditEntityUpdated -> repository.save(creditEntityUpdated))
-                                .doOnNext(creditEntity1 -> log.info("Balance updated"));
+                                .doOnNext(creditEntity1 -> log.info("Payment Document updated"));
 
                     }
                 });
@@ -351,25 +344,37 @@ public class CreditServiceImpl implements CreditService {
                 return Mono.error(buildException("En Pago prestamo, debe ingresar el Doc. de Pago Id, no procede."));
             }
 
+            return creditEntity.getIndividualLoan().getSchedule()
+                    .stream()
+                    .filter(feeDto -> feeDto.getUuid().equals(payment.getFeeId()))
+                    .findFirst()
+                    .map(feeDoc -> {
+                        log.info("Documento de pago {}", feeDoc);
+                        if (FeeStatusType.PAID.equals(feeDoc.getStatus())) {
+                            return Mono.<PaymentRequest>error(
+                                    buildException("En Pago prestamo, el documento de pago ya esta pagado, no procede.")
+                            );
+                        } else if (!feeDoc.getAmount().equals(payment.getAmount())) {
+                            return Mono.<PaymentRequest>error(
+                                    buildException("El monto de pago para el documento es "
+                                            + creditEntity.getCurrency() + " "
+                                            + feeDoc.getAmount()
+                                            + ", no procede.")
+                            );
+                        }
+                        log.info("Montos y campos requeridos, validados como PRESTAMO");
+                        return Mono.just(payment);
+                    })
+                    .orElseGet(() -> {
+                        log.info("validateAvailablePayment: No existe documento de pago con ese ID");
+                        return Mono.error(buildException("No existe documento de pago con ese ID, no procede."));
+                    });
+        } else {
+            log.info("Montos y campos requeridos, validados como TARJ CRED");
+            return Mono.just(payment);
         }
-        log.info("Montos y campos requeridos, validados");
-        return Mono.just(payment);
-        /*
-        return creditEntity.getIndividualLoan().getSchedule()
-                .stream()
-                .filter(feeDto -> feeDto.getUuid().equals(payment.getFeeId()))
-                .findFirst()
-                .map(feeDoc -> {
-                    if (FeeStatusType.PAID.equals(feeDoc.getStatus())) {
-                       return Mono.error(new IllegalStateException("En Pago prestamo, debe ingresar el Doc id"));
-
-                    }
-                    log.info("Montos y campos requeridos, validados");
-                    return Mono.just(payment);
-                })
-                .orElseGet(() -> Mono.error(new IllegalStateException("No existe doc")));
-        */
     }
+
     private Mono<ConsumptionRequest> validateAvailableConsumption(CreditEntity creditEntity,
                                                                   ConsumptionRequest consumption) {
         final Double currentBalance = creditEntity.getCreditCard().getCurrentBalance();
